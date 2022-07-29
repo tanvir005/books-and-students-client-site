@@ -5,7 +5,7 @@ import UpdateBookList from "./Pages/UpdateBookList";
 import UpdateStudentList from "./Pages/UpdateStudentList";
 import Grid from '@mui/material/Grid';
 import FrontPage from "./Components/FrontPage";
-import StudentList from "./Pages/StudentList";
+import StudentList from "./Pages/StudentList/StudentList";
 
 
 function App() {
