@@ -16,7 +16,7 @@ const StudentListDataShow = () => {
         <ListItem disablePadding>
           <ListItemButton>
             <ListItemIcon>
-              <StarIcon />
+             
             </ListItemIcon>
             <ListItemText primary="Chelsea Otakan" />
           </ListItemButton>
