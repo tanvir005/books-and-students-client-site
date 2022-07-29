@@ -1,24 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route } from "react-router-dom";
+import Home from './Components/Home';
+import BookList from "./Pages/BookList/BookList";
+import UpdateBookList from "./Pages/UpdateBookList";
+import UpdateStudentList from "./Pages/UpdateStudentList";
+import Grid from '@mui/material/Grid';
+import FrontPage from "./Components/FrontPage";
+import StudentList from "./Pages/StudentList";
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Grid container>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route index element={<FrontPage></FrontPage>} />
+          <Route path="book-list" element={<BookList />} />
+          <Route path="student-list" element={<StudentList />} />
+          <Route path="update-book-list" element={<UpdateBookList />} />
+          <Route path="update-student-list" element={<UpdateStudentList />} />
+        </Route>
+       
+      </Routes>
+    </Grid>
   );
 }
 
