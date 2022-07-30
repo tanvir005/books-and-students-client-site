@@ -1,125 +1,191 @@
 import * as React from 'react';
-import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
+import Grid from '@mui/material/Grid';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { Box } from '@mui/system';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+
+
 const BookListData = () => {
-    const columns = [
-        { id: 'name', label: 'Name', minWidth: 170 },
-        { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
-        {
-          id: 'population',
-          label: 'Population',
-          minWidth: 170,
-          align: 'right',
-          format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-          id: 'size',
-          label: 'Size\u00a0(km\u00b2)',
-          minWidth: 170,
-          align: 'right',
-          format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-          id: 'density',
-          label: 'Density',
-          minWidth: 170,
-          align: 'right',
-          format: (value) => value.toFixed(2),
-        },
-      ];
-      
-      function createData(name, code, population, size) {
-        const density = population / size;
-        return { name, code, population, size, density };
-      }
-      
-      const rows = [
-        createData('India', 'IN', 1324171354, 3287263),
-        createData('China', 'CN', 1403500365, 9596961),
-        createData('Italy', 'IT', 60483973, 301340),
-        createData('United States', 'US', 327167434, 9833520),
-        createData('Canada', 'CA', 37602103, 9984670),
-        createData('Australia', 'AU', 25475400, 7692024),
-        createData('Germany', 'DE', 83019200, 357578),
-        createData('Ireland', 'IE', 4857000, 70273),
-        createData('Mexico', 'MX', 126577691, 1972550),
-        createData('Japan', 'JP', 126317000, 377973),
-        createData('France', 'FR', 67022000, 640679),
-        createData('United Kingdom', 'GB', 67545757, 242495),
-        createData('Russia', 'RU', 146793744, 17098246),
-        createData('Nigeria', 'NG', 200962417, 923768),
-        createData('Brazil', 'BR', 210147125, 8515767),
-      ];
 
-      const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [open, setOpen] = React.useState(false);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const bookName = React.useRef('');
+  const authorName = React.useRef('');
+  const borrower = React.useRef('');
+  const borrowedDate = React.useRef('');
+  const returnDate = React.useRef('');
+
+  const handleClickAddBook = () => {
+    setOpen(true);
   };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+  const handleClose = () => {
+    setOpen(false);
   };
+  const handleAddClick = async event => {
+    event.preventDefault();
+    const data = {
+      book_name: bookName.current.value,
+      author_name: authorName.current.value,
+      borrower_name: borrower.current.value,
+      borrow_date: borrowedDate.current.value,
+      tentative_return_date: returnDate.current.value
+    }
+    fetch('http://localhost:5000/books', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(res => res.json())
+      .then(result => {
+        console.log(result)
+      })
+
+    setOpen(false)
+  }
+
+  const [books, setBooks] = React.useState([]);
+  React.useEffect(() => {
+    fetch('http://localhost:5000/books')
+      .then(res => res.json())
+      .then(data => setBooks(data))
+  }, [open])
+
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 14,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+      border: 0,
+    },
+  }));
 
 
-    return (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
+
+
+
+  const handleClickLendBook = () => {
+
+  }
+
+
+  return (
+
+    <Grid item xs={8} >
+      <Typography variant='h3' sx={{ p: 10 }}>Update Book List </Typography>
+
+      <TableContainer component={Paper} sx={{ ml: 15 }}>
+        <Table sx={{ minWidth: 500, ml: 15 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
+              <StyledTableCell>Book Nmae</StyledTableCell>
+              <StyledTableCell align="right">Author Name</StyledTableCell>
+              <StyledTableCell align="right">Borrowed By</StyledTableCell>
+              <StyledTableCell align="right">Borrowed Date</StyledTableCell>
+              <StyledTableCell align="right">Return Date</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+            {books.map((book) => (
+              <StyledTableRow key={book.book_name}>
+                <StyledTableCell component="th" scope="row">
+                  {book.book_name}
+                </StyledTableCell>
+                <StyledTableCell align="right">{book.author_name}</StyledTableCell>
+                <StyledTableCell align="right">{book.borrower_name}</StyledTableCell>
+                <StyledTableCell align="right">{book.borrow_date}</StyledTableCell>
+                <StyledTableCell align="right">{book.tentative_return_date}</StyledTableCell>
+                <Button onClick={()=> handleClickAddBook(books.id)} sx={{ bgcolor: 'green', color: 'black', fontWeight: 'bold', pl: 2, pr: 2 }}>Add Book</Button>
+              </StyledTableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </Paper>
-    );
+      <Box sx={{ display: 'flex', gap: 10, ml: 60, mt: 10 }}>
+        
+        
+      </Box>
+
+      <div>
+        <Dialog open={open}>
+          <DialogTitle>Add New Book</DialogTitle>
+          <DialogContent>
+
+            <TextField
+              autoFocus
+              margin="dense"
+              inputRef={bookName}
+              label="Book Name"
+              type="text"
+              fullWidth
+              variant="standard"
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              inputRef={authorName}
+              label="Author Name"
+              type="text"
+              fullWidth
+              variant="standard"
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              inputRef={borrower}
+              label="Borrower Name"
+              type="text"
+              fullWidth
+              variant="standard"
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              inputRef={borrowedDate}
+              label="Borrowed Date"
+              type="text"
+              fullWidth
+              variant="standard"
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              inputRef={returnDate}
+              label="Return Date"
+              type="text"
+              fullWidth
+              variant="standard"
+            />
+
+
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleAddClick}>Add</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </Grid>
+  );
 };
 
 export default BookListData;
